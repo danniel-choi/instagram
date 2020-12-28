@@ -1,14 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
+
 import { View, Text } from 'react-native'
 
-import firebase from 'firebase/app'
+import firebase from 'firebase'
 
-import { Provider } from "react-redux";
+import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './redux/reducers'
 import thunk from 'redux-thunk'
-const store = createStore(rootReducer, applyMiddleware(thunk));
+const store = createStore(rootReducer, applyMiddleware(thunk))
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBK8Cb7Gt9z3zu9z2T-RMX5uCJDfbeNEY8",
@@ -20,34 +23,37 @@ const firebaseConfig = {
   measurementId: "G-TEG50S2281"
 };
 
-if(firebase.apps.length === 0){
+
+if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig)
 }
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import LandingScreen from './component/auth/Landing'
-import RegisterScreen from './component/auth/Register'
-import MainScreen from './component/Main'
+import LandingScreen from './components/auth/Landing'
+import RegisterScreen from './components/auth/Register'
+import LoginScreen from './components/auth/Login'
+import MainScreen from './components/Main'
+import AddScreen from './components/main/Add'
+import SaveScreen from './components/main/Save'
+import CommentScreen from './components/main/Comment'
 
-import LoginScreen from './component/auth/Login'
-import { render } from 'react-dom';
-import AddScreen from './component/main/Add'
 
 const Stack = createStackNavigator();
 
+
 export class App extends Component {
   constructor(props) {
-    super(props);
+    super()
     this.state = {
-        loaded: false,
+      loaded: false,
     }
   }
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged((user) => {
-      if(!user){
+      if (!user) {
         this.setState({
           loggedIn: false,
           loaded: true,
@@ -60,22 +66,21 @@ export class App extends Component {
       }
     })
   }
-
   render() {
     const { loggedIn, loaded } = this.state;
-    if(!loaded) {
-      return(
-        <View style={{ flex: 1, justifyContent: 'center'}}>
+    if (!loaded) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center' }}>
           <Text>Loading</Text>
         </View>
       )
     }
 
-    if(!loggedIn) {
-      return(
+    if (!loggedIn) {
+      return (
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Landing">
-            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false}}/>
+            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
           </Stack.Navigator>
@@ -85,10 +90,12 @@ export class App extends Component {
 
     return (
       <Provider store={store}>
-        <NavigationContainer>          
+        <NavigationContainer >
           <Stack.Navigator initialRouteName="Main">
-            <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false}}/>
-            <Stack.Screen name="Add" component={AddScreen} />
+            <Stack.Screen name="Main" component={MainScreen} />
+            <Stack.Screen name="Add" component={AddScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Save" component={SaveScreen} navigation={this.props.navigation}/>
+            <Stack.Screen name="Comment" component={CommentScreen} navigation={this.props.navigation}/>
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
